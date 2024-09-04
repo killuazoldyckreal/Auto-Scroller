@@ -12,47 +12,73 @@
         container.style.position = 'fixed';
         container.style.top = '50%';
         container.style.left = '10px';
-        container.style.width = 'fit-content';
-        container.style.height = 'fit-content';
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
         container.style.transform = 'translateY(-50%)';
-        container.style.padding = '10px';
-        container.style.backgroundColor = '#ffffff';
-        container.style.borderRadius = '10px';
-        container.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        container.style.cursor = 'grab';
         container.style.zIndex = '1000';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'row';
+        container.style.alignItems = 'center';
+        container.style.cursor = 'grab';
         document.body.appendChild(container);
+
+        let dragIcon = document.createElement('div');
+        dragIcon.style.width = '30px';
+        dragIcon.style.height = '30px';
+        dragIcon.style.marginRight = '10px';
+        dragIcon.style.borderRadius = '50%';
+        dragIcon.style.border = '2px solid black';
+        dragIcon.style.display = 'flex';
+        dragIcon.style.alignItems = 'center';
+        dragIcon.style.justifyContent = 'center';
+        dragIcon.style.cursor = 'pointer';
+        container.appendChild(dragIcon);
+
+        let arrowUp = document.createElement('div');
+        arrowUp.style.width = '0';
+        arrowUp.style.height = '0';
+        arrowUp.style.borderLeft = '4px solid transparent';
+        arrowUp.style.borderRight = '4px solid transparent';
+        arrowUp.style.borderBottom = '4px solid black';
+        arrowUp.style.position = 'absolute';
+        arrowUp.style.top = '67px';
+        dragIcon.appendChild(arrowUp);
+
+        let circle = document.createElement('div');
+        circle.style.width = '4px';
+        circle.style.height = '4px';
+        circle.style.borderRadius = '50%';
+        circle.style.backgroundColor = 'black';
+        dragIcon.appendChild(circle);
+
+        let arrowDown = document.createElement('div');
+        arrowDown.style.width = '0';
+        arrowDown.style.height = '0';
+        arrowDown.style.borderLeft = '4px solid transparent';
+        arrowDown.style.borderRight = '4px solid transparent';
+        arrowDown.style.borderTop = '4px solid black';
+        arrowDown.style.position = 'absolute';
+        arrowDown.style.bottom = '67px';
+        dragIcon.appendChild(arrowDown);
 
         let slider = document.createElement('input');
         slider.type = 'range';
         slider.min = '-100';
         slider.max = '100';
         slider.value = '0';
-        slider.style.alignSelf = 'center';
-        slider.style.width = '20px'; 
-        slider.style.height = '150px'; 
-        slider.style.writingMode = 'vertical-rl'; 
-		slider.style.transform = 'rotate(180deg)';
-        slider.style.background = 'transparent';
+        slider.style.height = '150px';
+        slider.style.writingMode = 'vertical-rl';
+        slider.style.transform = 'rotate(180deg)';
+        slider.style.visibility = 'hidden';
+        slider.style.transition = 'visibility 0.3s';
         container.appendChild(slider);
 
-        let dragIcon = document.createElement('div');
-        dragIcon.style.width = '20px';
-        dragIcon.style.height = '20px';
-        dragIcon.style.marginTop = '10px';
-        dragIcon.style.backgroundColor = '#007BFF';
-        dragIcon.style.borderRadius = '50%';
-        dragIcon.style.cursor = 'pointer';
-		dragIcon.style.alignSelf = 'center';
-        container.appendChild(dragIcon);
-
         let speedFactor = 0;
-        let clickTimeout = null;
+        let hideSliderTimeout = null;
+        let isDragging = false;
 
         slider.addEventListener('input', function() {
             speedFactor = -parseInt(this.value);
+            clearTimeout(hideSliderTimeout);
+            resetHideSliderTimeout();
         });
 
         function scrollPage() {
@@ -62,30 +88,30 @@
 
         scrollPage();
 
-        let isDragging = false;
+        function resetHideSliderTimeout() {
+            clearTimeout(hideSliderTimeout);
+            hideSliderTimeout = setTimeout(() => {
+                slider.style.visibility = 'hidden';
+            }, 3000);
+        }
 
-        dragIcon.addEventListener('mousedown', function(e) {
-            if (e.button === 0) {
-                if (clickTimeout) {
-                    clearTimeout(clickTimeout);
-                    clickTimeout = null;
-                    speedFactor = 0;
-                    slider.value = '0';
-                } else {
-                    clickTimeout = setTimeout(() => {
-                        isDragging = true;
-                        dragIcon.style.cursor = 'grabbing';
-                        clickTimeout = null;
-                    }, 400);
-                }
+        dragIcon.addEventListener('click', function(e) {
+            if (e.detail === 2) {
+                speedFactor = 0;
+                slider.value = '0';
+            } else {
+                clearTimeout(hideSliderTimeout);
+                slider.style.visibility = 'visible';
+                resetHideSliderTimeout();
             }
         });
 
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            if (isDragging) {
-                isDragging = false;
-                dragIcon.style.cursor = 'pointer';
+        dragIcon.addEventListener('mousedown', function(e) {
+            if (e.button === 0) {
+                isDragging = true;
+                dragIcon.style.cursor = 'grabbing';
+                slider.style.visibility = 'visible';
+                clearTimeout(hideSliderTimeout);
             }
         });
 
@@ -109,15 +135,18 @@
         });
 
         document.addEventListener('mouseup', function(e) {
-            if (isDragging && e.button === 2) {
+            if (isDragging && e.button === 0) {
                 isDragging = false;
                 dragIcon.style.cursor = 'pointer';
+                resetHideSliderTimeout();
             }
         });
 
         dragIcon.ondragstart = function() {
             return false;
         };
+
+        resetHideSliderTimeout();
     }
 
     function init() {
