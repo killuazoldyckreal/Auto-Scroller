@@ -21,12 +21,15 @@
         document.body.appendChild(container);
 
         let dragIcon = document.createElement('div');
-        dragIcon.style.width = '30px';
-        dragIcon.style.height = '30px';
+        dragIcon.style.setProperty('width', '30px', 'important');
+        dragIcon.style.setProperty('height', '30px', 'important');
         dragIcon.style.marginRight = '10px';
         dragIcon.style.borderRadius = '50%';
+        dragIcon.style.backgroundColor = 'white';
         dragIcon.style.border = '2px solid black';
         dragIcon.style.display = 'flex';
+        dragIcon.style.flexDirection = 'column';
+        dragIcon.style.gap = '4px';
         dragIcon.style.alignItems = 'center';
         dragIcon.style.justifyContent = 'center';
         dragIcon.style.cursor = 'pointer';
@@ -38,8 +41,6 @@
         arrowUp.style.borderLeft = '4px solid transparent';
         arrowUp.style.borderRight = '4px solid transparent';
         arrowUp.style.borderBottom = '4px solid black';
-        arrowUp.style.position = 'absolute';
-        arrowUp.style.top = '67px';
         dragIcon.appendChild(arrowUp);
 
         let circle = document.createElement('div');
@@ -55,8 +56,6 @@
         arrowDown.style.borderLeft = '4px solid transparent';
         arrowDown.style.borderRight = '4px solid transparent';
         arrowDown.style.borderTop = '4px solid black';
-        arrowDown.style.position = 'absolute';
-        arrowDown.style.bottom = '67px';
         dragIcon.appendChild(arrowDown);
 
         let slider = document.createElement('input');
@@ -64,6 +63,7 @@
         slider.min = '-100';
         slider.max = '100';
         slider.value = '0';
+        slider.style.width = '10px';
         slider.style.height = '150px';
         slider.style.writingMode = 'vertical-rl';
         slider.style.transform = 'rotate(180deg)';
