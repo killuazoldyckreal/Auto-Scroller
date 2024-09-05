@@ -74,6 +74,7 @@
         let speedFactor = 0;
         let hideSliderTimeout = null;
         let isDragging = false;
+        let initialMouseX, initialMouseY, initialContainerX, initialContainerY, offsetX, offsetY;
 
         slider.addEventListener('input', function() {
             speedFactor = -parseInt(this.value);
@@ -112,25 +113,35 @@
                 dragIcon.style.cursor = 'grabbing';
                 slider.style.visibility = 'visible';
                 clearTimeout(hideSliderTimeout);
+
+                initialMouseX = e.clientX;
+                initialMouseY = e.clientY;
+                initialContainerX = container.getBoundingClientRect().left;
+                initialContainerY = container.getBoundingClientRect().top;
+                offsetX = initialContainerX - e.clientX;
+                offsetY = initialContainerY - e.clientY;
             }
         });
 
         document.addEventListener('mousemove', function(e) {
             if (isDragging) {
-                let shiftX = e.clientX - container.offsetWidth / 2;
-                let shiftY = e.clientY - container.offsetHeight / 2;
+                const dx = e.clientX + offsetX;
+                const dy = e.clientY + offsetY;
 
-                if (shiftX < 0) shiftX = 0;
-                if (shiftY < 0) shiftY = 0;
-                if (shiftX + container.offsetWidth > window.innerWidth) {
-                    shiftX = window.innerWidth - container.offsetWidth;
+                let newLeft = dx;
+                let newTop = dy;
+
+                if (newLeft < 0) newLeft = 0;
+                if (newTop < 0) newTop = 0;
+                if (newLeft + container.offsetWidth > window.innerWidth) {
+                    newLeft = window.innerWidth - container.offsetWidth;
                 }
-                if (shiftY + container.offsetHeight > window.innerHeight) {
-                    shiftY = window.innerHeight - container.offsetHeight;
+                if (newTop + container.offsetHeight > window.innerHeight) {
+                    newTop = window.innerHeight - container.offsetHeight;
                 }
 
-                container.style.left = shiftX + 'px';
-                container.style.top = shiftY + 'px';
+                container.style.left = newLeft + 'px';
+                container.style.top = newTop + 77 + 'px';
             }
         });
 
